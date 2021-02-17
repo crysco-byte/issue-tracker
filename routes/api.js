@@ -84,17 +84,7 @@ module.exports = function (app) {
           project: project,
         },
         (err, doc) => {
-          res.json({
-            _id: doc._id,
-            issue_title: doc.issue_title,
-            issue_text: doc.issue_text,
-            created_by: doc.created_by,
-            assigned_to: doc.assigned_to,
-            status_text: doc.status_text,
-            open: doc.open,
-            created_on: doc.created_on,
-            updated_on: doc.updated_on,
-          });
+          res.send(doc);
         }
       );
     })
@@ -127,6 +117,7 @@ module.exports = function (app) {
           status_text: status_text,
         }),
         ...((open == undefined ? false : true) && { open: false }),
+        updated_on: new Date().toISOString(),
       };
       let result = await issueModel.update({ _id: _id }, updateObjs);
 

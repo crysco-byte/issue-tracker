@@ -27,6 +27,16 @@ suite("Functional Tests", function () {
         done();
       });
   });
+  test("required fields error", (done) => {
+    chai
+      .request(server)
+      .post("/api/issues/apitest")
+      .send({})
+      .end((err, res) => {
+        assert.equal(res.body.error, "required field(s) missing");
+        done();
+      });
+  });
   test("Get issue", (done) => {
     chai
       .request(server)

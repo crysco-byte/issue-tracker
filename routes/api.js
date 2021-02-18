@@ -70,6 +70,12 @@ module.exports = function (app) {
         assigned_to,
         status_text,
       } = req.body;
+      if (
+        (issue_title == undefined) |
+        (issue_text == undefined) |
+        (created_by == undefined)
+      )
+        return res.send({ error: "required field(s) missing" });
 
       issueModel.create(
         {

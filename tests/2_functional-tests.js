@@ -51,6 +51,16 @@ suite("Functional Tests", function () {
         done();
       });
   });
+  test("(put) missing id", (done) => {
+    chai
+      .request(server)
+      .put("/api/issues/apitest")
+      .send()
+      .end((err, res) => {
+        assert.equal(res.body.error, "missing _id");
+        done();
+      });
+  });
   test("Update Doc", (done) => {
     chai
       .request(server)
@@ -67,6 +77,17 @@ suite("Functional Tests", function () {
       .end((err, res) => {
         assert.equal(res.body.result, "successfully updated");
         assert.equal(res.body._id, "602c173739c34e7cf0839b13");
+        done();
+      });
+  });
+
+  test("(put) no update fields", (done) => {
+    chai
+      .request(server)
+      .put("/api/issues/apitest")
+      .send({ _id: "602c173739c34e7cf0839b13" })
+      .end((err, res) => {
+        assert.equal(res.body.error, "no update field(s) sent");
         done();
       });
   });

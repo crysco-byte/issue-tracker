@@ -116,6 +116,16 @@ module.exports = function (app) {
         status_text,
         open,
       } = req.body;
+      if (_id == undefined) return res.send({ error: "missing _id" });
+      if (
+        (issue_title == undefined) &
+        (issue_text == undefined) &
+        (created_by == undefined) &
+        (assigned_to == undefined) &
+        (status_text == undefined) &
+        (open == undefined)
+      )
+        return res.send({ error: "no update field(s) sent", _id: _id });
       let updateObjs = {
         ...((issue_title == "" ? false : true) && {
           issue_title: issue_title,
@@ -139,15 +149,16 @@ module.exports = function (app) {
 
       result.n === 1
         ? res.json({ result: "successfully updated", _id: _id })
-        : null;
+        : res.json({ error: "could not update", _id: _id });
     })
 
     .delete(async function (req, res) {
       let project = req.params.project;
       const { _id } = req.body;
       let result = await issueModel.deleteOne({ _id: _id });
+      _id == undefined ? res.send({ error: "missing _id" }) : null;
       result.n === 1
         ? res.send({ result: "successfully deleted", _id: _id })
-        : null;
+        : res.send({ result: "could not delete", _id: _id });
     });
 };

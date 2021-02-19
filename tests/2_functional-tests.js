@@ -91,4 +91,39 @@ suite("Functional Tests", function () {
         done();
       });
   });
+  test("(get) get issues based on project name", (done) => {
+    chai
+      .request(server)
+      .post("/api/issues/test111")
+      .type("form")
+      .send({
+        issue_title: "test",
+        issue_text: "test",
+        created_by: "test case",
+      })
+      .end();
+    chai
+      .request(server)
+      .post("/api/issues/test222")
+      .type("form")
+      .send({
+        issue_title: "test",
+        issue_text: "test",
+        created_by: "test case",
+      })
+      .end();
+    chai
+      .request(server)
+      .get("/api/issues/test111")
+      .end((err, res) => {
+        assert.isTrue(res.body.length > 0);
+      });
+    chai
+      .request(server)
+      .get("/api/issues/test222")
+      .end((err, res) => {
+        assert.isTrue(res.body.length > 0);
+        done();
+      });
+  });
 });

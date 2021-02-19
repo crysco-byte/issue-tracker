@@ -4,17 +4,20 @@ mongoose.connect(process.env.DB, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-const issueSchema = new mongoose.Schema({
-  issue_title: { type: String, required: true },
-  issue_text: { type: String, required: true },
-  created_by: { type: String, required: true },
-  assigned_to: String,
-  status_text: String,
-  open: Boolean,
-  created_on: String,
-  updated_on: String,
-  project: String,
-});
+const issueSchema = new mongoose.Schema(
+  {
+    issue_title: { type: String, required: true },
+    issue_text: { type: String, required: true },
+    created_by: { type: String, required: true },
+    assigned_to: String,
+    status_text: String,
+    open: Boolean,
+    created_on: String,
+    updated_on: String,
+    project: String,
+  },
+  { version_key: false, project: false }
+);
 
 const issueModel = mongoose.model("issueModel", issueSchema);
 
@@ -55,10 +58,12 @@ module.exports = function (app) {
         }),
         project: project,
       };
-      issueModel.find(queryObj, (err, doc) => {
-        if (err) res.send(err);
-        res.send(doc);
-      });
+      issueModel
+        .find(queryObj, (err, doc) => {
+          if (err) res.send(err);
+          res.send(doc);
+        })
+        .select("-__v -project");
     })
 
     .post(function (req, res) {
@@ -153,12 +158,16 @@ module.exports = function (app) {
     })
 
     .delete(async function (req, res) {
-      let project = req.params.project;
       const { _id } = req.body;
-      let result = await issueModel.deleteOne({ _id: _id });
       _id == undefined ? res.send({ error: "missing _id" }) : null;
-      result.n === 1
-        ? res.send({ result: "successfully deleted", _id: _id })
-        : res.send({ result: "could not delete", _id: _id });
+
+      try {
+        let result = await issueModel.deleteOne({ _id: _id });
+        result.n === 1
+          ? res.send({ result: "successfully deleted", _id: _id })
+          : res.send({ result: "could not delete", _id: _id });
+      } catch (e) {
+        res.send({ result: "could not delete", _id: _id });
+      }
     });
 };

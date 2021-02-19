@@ -159,15 +159,19 @@ module.exports = function (app) {
 
     .delete(async function (req, res) {
       const { _id } = req.body;
-      _id == undefined ? res.send({ error: "missing _id" }) : null;
-
-      try {
-        let result = await issueModel.deleteOne({ _id: _id });
-        result.n === 1
-          ? res.send({ result: "successfully deleted", _id: _id })
-          : res.send({ result: "could not delete", _id: _id });
-      } catch (e) {
-        res.send({ result: "could not delete", _id: _id });
+      if (_id == undefined) {
+        res.send({ error: "missing _id" });
+      } else {
+        try {
+          let result = await issueModel.deleteOne({ _id: _id });
+          if (result.n === 1) {
+            res.send({ result: "successfully deleted", _id: _id });
+          } else {
+            res.send({ result: "could not delete", _id: _id });
+          }
+        } catch (e) {
+          res.send({ result: "could not delete", _id: _id });
+        }
       }
     });
 };

@@ -126,4 +126,74 @@ suite("Functional Tests", function () {
         done();
       });
   });
+  test("(get) get by id", (done) => {
+    chai
+      .request(server)
+      .get("/api/issues/apitest")
+      .query({ _id: "60316656ae60957a981ec868" })
+      .end((err, res) => {
+        assert.isTrue(res.body.length > 0);
+        done();
+      });
+  });
+  test("(get) get by issue_title", (done) => {
+    chai
+      .request(server)
+      .get("/api/issues/apitest")
+      .query({ issue_title: "23" })
+      .end((err, res) => {
+        assert.isTrue(res.body.length > 0);
+        done();
+      });
+  });
+  test("(get) get by issue_text", (done) => {
+    chai
+      .request(server)
+      .get("/api/issues/apitest")
+      .query({ issue_text: "23" })
+      .end((err, res) => {
+        assert.isTrue(res.body.length > 0);
+        done();
+      });
+  });
+  test("(get) get by author", (done) => {
+    chai
+      .request(server)
+      .get("/api/issues/apitest")
+      .query({ created_by: "23" })
+      .end((err, res) => {
+        assert.isTrue(res.body.length > 0);
+        done();
+      });
+  });
+  test("(get) get by creation date", (done) => {
+    chai
+      .request(server)
+      .get("/api/issues/apitest")
+      .query({ created_on: "2021-02-20T19:43:18.197Z" })
+      .end((err, res) => {
+        assert.isTrue(res.body.length > 0);
+        done();
+      });
+  });
+  test("(get) get by update date", (done) => {
+    chai
+      .request(server)
+      .get("/api/issues/apitest")
+      .query({ updated_on: "2021-02-20T19:43:18.197Z" })
+      .end((err, res) => {
+        assert.isTrue(res.body.length > 0);
+        done();
+      });
+  });
+  test("(delete) missing _id error", (done) => {
+    chai
+      .request(server)
+      .delete("/api/issues/apitest")
+      .send({})
+      .end((err, res) => {
+        assert.equal(res.body.error, "missing _id");
+        done();
+      });
+  });
 });

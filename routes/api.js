@@ -14,9 +14,9 @@ const issueSchema = new mongoose.Schema(
     open: Boolean,
     created_on: String,
     updated_on: String,
-    project: String,
+    project: { type: String, select: false },
   },
-  { version_key: false, project: false }
+  { version_key: false }
 );
 
 const issueModel = mongoose.model("issueModel", issueSchema);
@@ -66,9 +66,9 @@ module.exports = function (app) {
         .select("-__v -project");
     })
 
-    .post(function (req, res) {
-      let project = req.params.project;
-      const {
+    .post(async function (req, res) {
+      let projectName = req.params.project;
+      let {
         issue_title,
         issue_text,
         created_by,
@@ -82,32 +82,27 @@ module.exports = function (app) {
       )
         return res.send({ error: "required field(s) missing" });
 
-      issueModel.create(
-        {
-          issue_title: issue_title,
-          issue_text: issue_text,
-          created_by: created_by,
-          assigned_to: assigned_to,
-          status_text: status_text,
-          open: true,
-          created_on: new Date().toISOString(),
-          updated_on: new Date().toISOString(),
-          project: project,
-        },
-        (err, doc) => {
-          res.send({
-            _id: doc["_id"],
-            issue_title: doc.issue_title,
-            issue_text: doc.issue_text,
-            created_by: doc.created_by,
-            assigned_to: doc.assigned_to,
-            status_text: doc.status_text,
-            open: doc.open,
-            created_on: doc.created_on,
-            updated_on: doc.updated_on,
-          });
-        }
-      );
+      assigned_to == undefined ? (assigned_to = "") : null;
+      status_text == undefined ? (status_text = "") : null;
+
+      const newIssue = new issueModel({
+        issue_title: issue_title,
+        issue_text: issue_text,
+        created_by: created_by,
+        assigned_to: assigned_to,
+        status_text: status_text,
+        open: true,
+        created_on: new Date().toISOString(),
+        updated_on: new Date().toISOString(),
+        project: projectName,
+      });
+      const doc = await newIssue.save();
+      issueModel
+        .findById(doc._id, (err, doc) => {
+          if (err) console.log(err);
+          res.send(doc);
+        })
+        .select("-__v");
     })
 
     .put(async function (req, res) {
